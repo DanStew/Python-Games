@@ -1,4 +1,5 @@
 import turtle
+import winsound 
 
 #Creating the window for the game
 wn = turtle.Screen()
@@ -112,10 +113,15 @@ while True:
         ball.sety(290)
         #This reverse the directions that the ball is going
         ball.dy *= -1
+        #Line below is how you play sounds using the winsound library
+        #Async is implemented to play the sound in the background
+        #Otherwise, the entire program will stop just to play the sound
+        winsound.PlaySound("pongSound.wav", winsound.SND_ASYNC)
 
     if ball.ycor() <= -290:
         ball.sety(-290)
         ball.dy *= -1
+        winsound.PlaySound("pongSound.wav", winsound.SND_ASYNC)
 
     #These 2 below check to see whether the player has scored
     if ball.xcor() >= 390:
@@ -136,8 +142,10 @@ while True:
     if (ball.xcor() < -340 and ball.xcor() > -350 and (ball.ycor() < paddle_a.ycor() + 50 and ball.ycor() > paddle_a.ycor() -50)):
         ball.dx *= -1
         ball.setx(-340)
+        winsound.PlaySound("pongSound.wav", winsound.SND_ASYNC)
 
     #Checking to see whether the ball has hit a paddel
     if (ball.xcor() > 340 and ball.xcor() < 350 and (ball.ycor() < paddle_b.ycor() + 50 and ball.ycor() > paddle_b.ycor() -50)):
         ball.dx *= -1
         ball.setx(340)
+        winsound.PlaySound("pongSound.wav", winsound.SND_ASYNC)
