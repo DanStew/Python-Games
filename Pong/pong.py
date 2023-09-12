@@ -86,6 +86,17 @@ wn.onkeypress(paddle_b_down, "Down")
 player1_score = 0
 player2_score = 0
 
+#Creating a Pen to draw the text
+pen = turtle.Turtle()
+pen.speed(0)
+pen.color("white")
+pen.penup()
+#Means that you won't see the pen actually move
+pen.hideturtle()
+pen.goto(0,260)
+#Writing the score of the game to the screen
+pen.write(f"Player A: {player1_score} Player B: {player2_score}", align="center", font=("Courier",24))
+
 #Main game loop
 while True:
     #Every time the window runs, it updates the screen
@@ -111,11 +122,15 @@ while True:
         player1_score += 1
         ball.goto(0,0)
         ball.dx *= -1
+        pen.clear()
+        pen.write(f"Player A: {player1_score} Player B: {player2_score}", align="center", font=("Courier",24))
 
     if ball.xcor() <= -390:
         player2_score += 1
         ball.goto(0,0)
         ball.dx *= -1
+        pen.clear()
+        pen.write(f"Player A: {player1_score} Player B: {player2_score}", align="center", font=("Courier",24))
 
     #Checking to see whether the ball has hit a paddel
     if (ball.xcor() < -340 and ball.xcor() > -350 and (ball.ycor() < paddle_a.ycor() + 50 and ball.ycor() > paddle_a.ycor() -50)):
