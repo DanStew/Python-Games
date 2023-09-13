@@ -62,11 +62,63 @@ class RedCube():
         self.turtle.shape("square")
         self.turtle.goto(coords)
 
+class OrangeCube():
+    def __init__ (self, coords):
+        #Initial Setup of the Cube
+        self.score = 15
+        self.speed = 8
+        self.coords = coords
+
+        #Setting up the cubes turtle
+        self.turtle = turtle.Turtle()
+        self.turtle.penup()
+        self.turtle.speed(0)
+        self.turtle.color("orange")
+        self.turtle.shape("square")
+        self.turtle.goto(coords)
+
+class YellowCube():
+    def __init__ (self, coords):
+        #Initial Setup of the Cube
+        self.score = 10
+        self.speed = 6
+        self.coords = coords
+
+        #Setting up the cubes turtle
+        self.turtle = turtle.Turtle()
+        self.turtle.penup()
+        self.turtle.speed(0)
+        self.turtle.color("yellow")
+        self.turtle.shape("square")
+        self.turtle.goto(coords)
+
+class GreenCube():
+    def __init__ (self, coords):
+        #Initial Setup of the Cube
+        self.score = 5
+        self.speed = 4
+        self.coords = coords
+
+        #Setting up the cubes turtle
+        self.turtle = turtle.Turtle()
+        self.turtle.penup()
+        self.turtle.speed(0)
+        self.turtle.color("green")
+        self.turtle.shape("square")
+        self.turtle.goto(coords)
+
 #Creating the cubes
-redCube_1 = RedCube((20,280))
-cubes = []
-cubes.append(redCube_1)
-print(cubes[0].coords)
+cubes =[]
+x = -220
+for cube in range(12):
+    #Creating 1 of each type of cube 10 times
+    cubes.append(RedCube((x,260)))
+    cubes.append(OrangeCube((x,220)))
+    cubes.append(YellowCube((x,180)))
+    cubes.append(GreenCube((x,140)))
+    
+    #Incrementing the x total
+    x += 40
 
 #Main loop for the game
 while True : 
