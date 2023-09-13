@@ -5,6 +5,7 @@ wn = turtle.Screen()
 wn.bgcolor("black")
 wn.setup(width=500,height=600)
 wn.title("Breakout")
+wn.tracer(0)
 
 #Creating the paddle
 paddle = turtle.Turtle()
@@ -14,7 +15,7 @@ paddle.shape("square")
 paddle.color("white")
 paddle.shapesize(stretch_wid=1,stretch_len=4)
 paddle.goto(0,-200)
-paddle.dx = 8
+paddle.dx = 16
 
 #Creating the ball
 ball = turtle.Turtle()
@@ -23,8 +24,8 @@ ball.shape("square")
 ball.speed(0)
 ball.color("white")
 ball.goto(0,0)
-ball.dx = 4
-ball.dy = 4
+ball.dx = 1
+ball.dy = 1
 
 #Moving the paddle
 
@@ -51,7 +52,7 @@ class RedCube():
     def __init__ (self, coords):
         #Initial Setup of the Cube
         self.score = 20
-        self.speed = 10
+        self.speed = 1.6
         self.coords = coords
 
         #Setting up the cubes turtle
@@ -66,7 +67,7 @@ class OrangeCube():
     def __init__ (self, coords):
         #Initial Setup of the Cube
         self.score = 15
-        self.speed = 8
+        self.speed = 1.4
         self.coords = coords
 
         #Setting up the cubes turtle
@@ -81,7 +82,7 @@ class YellowCube():
     def __init__ (self, coords):
         #Initial Setup of the Cube
         self.score = 10
-        self.speed = 6
+        self.speed = 1.2
         self.coords = coords
 
         #Setting up the cubes turtle
@@ -96,7 +97,7 @@ class GreenCube():
     def __init__ (self, coords):
         #Initial Setup of the Cube
         self.score = 5
-        self.speed = 4
+        self.speed = 0.6
         self.coords = coords
 
         #Setting up the cubes turtle
@@ -119,6 +120,19 @@ for cube in range(12):
     
     #Incrementing the x total
     x += 40
+
+#Initialising score and text
+score = 0
+
+pen = turtle.Turtle()
+pen.speed(0)
+pen.color("white")
+pen.penup()
+#Means that you won't see the pen actually move
+pen.hideturtle()
+pen.goto(0,-280)
+#Writing the score of the game to the screen
+pen.write(f"Score : {score}", align="center", font=("Courier",24))
 
 #Main loop for the game
 while True : 
@@ -158,12 +172,19 @@ while True :
         ball.sety(-190)
 
     #Checking to see if the ball 
-    for cube in cubes:
-        if ((ball.xcor() < cube.coords[0] + 20 and ball.xcor() > cube.coords[0] -20) and (ball.ycor() < cube.coords[1] + 20 and ball.ycor() > cube.coords[1] -20)):
-            #Hiding the cube so it can't be seen
-            cube.turtle.hideturtle()
-            #Popping the cube from the coords, so it is no longer checked
-            cubes.remove(cube)
-            #Setting the balls new speed
-            ball.dy = -cube.speed
+    #First if is to reduce the amount of times this code has to be run
+    if ball.ycor() > 120 : 
+        for cube in cubes:
+            if ((ball.xcor() < cube.coords[0] + 20 and ball.xcor() > cube.coords[0] -20) and (ball.ycor() < cube.coords[1] + 20 and ball.ycor() > cube.coords[1] -20)):
+                #Hiding the cube so it can't be seen
+                cube.turtle.hideturtle()
+                #Popping the cube from the coords, so it is no longer checked
+                cubes.remove(cube)
+                #Setting the balls new speed
+                ball.dy = -cube.speed
+
+                #Updating the score
+                score += cube.score
+                pen.clear()
+                pen.write(f"Score : {score}", align="center", font=("Arial",24))
             
