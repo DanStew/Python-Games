@@ -160,4 +160,10 @@ while True :
     #Checking to see if the ball 
     for cube in cubes:
         if ((ball.xcor() < cube.coords[0] + 20 and ball.xcor() > cube.coords[0] -20) and (ball.ycor() < cube.coords[1] + 20 and ball.ycor() > cube.coords[1] -20)):
+            #Hiding the cube so it can't be seen
             cube.turtle.hideturtle()
+            #Popping the cube from the coords, so it is no longer checked
+            cubes.remove(cube)
+            #Setting the balls new speed
+            ball.dy = -cube.speed
+            
