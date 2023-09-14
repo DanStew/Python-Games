@@ -1,4 +1,5 @@
 import turtle
+import time
 
 #Creating the window
 wn = turtle.Screen()
@@ -121,8 +122,9 @@ for cube in range(12):
     #Incrementing the x total
     x += 40
 
-#Initialising score and text
+#Initialising score, lives and text
 score = 0
+lives = 3
 
 pen = turtle.Turtle()
 pen.speed(0)
@@ -130,9 +132,28 @@ pen.color("white")
 pen.penup()
 #Means that you won't see the pen actually move
 pen.hideturtle()
-pen.goto(0,-280)
 #Writing the score of the game to the screen
-pen.write(f"Score : {score}", align="center", font=("Courier",24))
+pen.goto(-220,-280)
+pen.write(f"Score : {score}", align="left", font=("Courier",24))
+pen.goto(40,-280)
+pen.write(f"Lives : {lives}", align="left", font=("Courier",24))
+
+#Making the gameover screen function
+def gameOverScreen():
+    wn.clear()
+    wn.bgcolor("black")
+    pen.goto(0,0)
+    pen.write("Game Over ! ", align="center", font=("Courier", 32))
+
+#Making the gamewin screen function
+def gameWin():
+    wn.clear()
+    wn.bgcolor("black")
+    pen.goto(0,0)
+    pen.write("You Won ! ", align="center", font=("Courier", 32))
+
+#Initialising the time part of this
+lastTime = 0 
 
 #Main loop for the game
 while True : 
@@ -163,8 +184,25 @@ while True :
         ball.dy *= -1
     
     if (ball.ycor() < -280):
-        ball.sety(-280)
-        ball.dy *= -1
+        #Setting procedure for if user dies
+        #Updating the text
+        lives -= 1
+        pen.clear()
+        pen.goto(-220,-280)
+        pen.write(f"Score : {score}", align="left", font=("Courier",24))
+        pen.goto(40,-280)
+        pen.write(f"Lives : {lives}", align="left", font=("Courier",24))
+
+        #Resetting speed and position
+        ball.goto(0,0)
+        ball.dx = 1
+        ball.dy = 1
+        time.sleep(1)
+
+        #Checking GameOver
+        if lives == -1:
+            gameOverScreen()
+
 
     #Checking for ball collision with paddle
     if (ball.ycor() < -190 and ball.ycor() > -210 and (ball.xcor() < paddle.xcor() + 40 and ball.xcor() > paddle.xcor() -40)):
@@ -173,7 +211,8 @@ while True :
 
     #Checking to see if the ball 
     #First if is to reduce the amount of times this code has to be run
-    if ball.ycor() > 120 : 
+    #Time stuff introduced to stop multiple blocks being hit at the same time
+    if (ball.ycor() > 120) and (time.time() - lastTime > 1): 
         for cube in cubes:
             if ((ball.xcor() < cube.coords[0] + 20 and ball.xcor() > cube.coords[0] -20) and (ball.ycor() < cube.coords[1] + 20 and ball.ycor() > cube.coords[1] -20)):
                 #Hiding the cube so it can't be seen
@@ -186,5 +225,16 @@ while True :
                 #Updating the score
                 score += cube.score
                 pen.clear()
-                pen.write(f"Score : {score}", align="center", font=("Arial",24))
+                pen.goto(-220,-280)
+                pen.write(f"Score : {score}", align="left", font=("Courier",24))
+                pen.goto(40,-280)
+                pen.write(f"Lives : {lives}", align="left", font=("Courier",24))
+
+                #Adding the time to delay this function
+                lastTime = time.time()
+
+        #Checking game win function
+        if len(cubes) == 0:
+            gameWin()
+                
             
