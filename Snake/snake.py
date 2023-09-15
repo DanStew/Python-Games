@@ -5,11 +5,11 @@ import tkinter as tk
 from tkinter import messagebox
 
 class cube(object):
-    rows=20
-    w=500
 
-    def __init__(self,start,dirnx=1,dirny=0,color=(255,0,0)):
+    def __init__(self,start,rows,width,dirnx=1,dirny=0,color=(255,0,0)):
         self.pos = start
+        self.rows = rows
+        self.width = width
         self.dirnx = 1
         self.dirny = 0
         self.color = color
@@ -23,7 +23,7 @@ class cube(object):
         
     def draw(self, surface, eyes=False):
         #Finding the distance between x and y values
-        dis = self.w // self.rows
+        dis = width // rows
 
         #Finding the i and j of the position you want to draw
         #This is where in the rows and columns, not the pixel count
@@ -57,10 +57,12 @@ class snake(object):
     turns = {}
 
     #Initialising the snake object
-    def __init__(self,color,pos):
+    def __init__(self,color,pos, rows, width):
         self.color = color
+        self.rows = rows
+        self.width = width
         #Initialising the head of the snake at it given position
-        self.head = cube(pos)
+        self.head = cube(pos, rows,width)
         #Adding the head cube to the list of cubes
         self.snakeBody.append(self.head)
         #Setting the initial values for the direction of the snake
@@ -151,7 +153,7 @@ class snake(object):
     #This is so that the game restarts
     def reset(self,pos):
         print("Snake has been reset")
-        self.head = cube(pos)
+        self.head = cube(pos, self.rows,self.width)
         self.snakeBody = []
         self.snakeBody.append(self.head)
         self.turns = {}
@@ -165,13 +167,13 @@ class snake(object):
 
         #Positioning where the new cube will be placed (and also creating the cube)
         if dx == 1 and dy == 0:
-            self.snakeBody.append(cube((tail.pos[0] -1,tail.pos[1])))
+            self.snakeBody.append(cube((tail.pos[0] -1,tail.pos[1]), self.rows, self.width))
         elif dx == -1 and dy == 0:
-            self.snakeBody.append(cube((tail.pos[0] +1,tail.pos[1])))
+            self.snakeBody.append(cube((tail.pos[0] +1,tail.pos[1]), self.rows, self.width))
         elif dx == 0 and dy == 1:
-            self.snakeBody.append(cube((tail.pos[0],tail.pos[1]-1)))
+            self.snakeBody.append(cube((tail.pos[0],tail.pos[1]-1), self.rows, self.width))
         elif dx == 0 and dy == -1:
-            self.snakeBody.append(cube((tail.pos[0],tail.pos[1]+1)))
+            self.snakeBody.append(cube((tail.pos[0],tail.pos[1]+1), self.rows, self.width))
 
         #Setting the direction of the new cube just made to be the same as the tail
         self.snakeBody[-1].dirnx = dx
@@ -254,6 +256,31 @@ def message_box(subject,content):
         root.destroy()
     except:
         pass
+
+#Function used to store and collect the highscore
+def getHighscore(rows, score):
+    newHighScore = False
+    rowFound = False
+
+    with open('highScore.txt') as f:
+        for line in f:
+            lineData = line.split(" ")
+            print(lineData)
+            if lineData[0] == rows:
+                print("Row Found")
+                print(lineData[1])
+                rowFound = True
+                if score > lineData[1]:
+                    newHighScore = True
+                else : 
+                    highScore = lineData[1]
+    
+    if rowFound == False or newHighScore == True : 
+        with open('highScore.txt', 'w') as f:
+            f.write(rows + ' ' + score)
+            return score, True
+    else : 
+        return highScore, False
     
 
 #This is the main function that everything is called from
@@ -263,7 +290,7 @@ def main():
 
     #This is the dimensions of the window to be created
     #Only need 1 variable as grid is 500x500
-    width = 500
+    width = 600
 
     #Make sure that is divisable by the width and height
     rows = 20
@@ -272,10 +299,10 @@ def main():
     win = pygame.display.set_mode((width,width)) 
 
     #Creating the snake for the game
-    s = snake((255,0,0), (10,10)) 
+    s = snake((255,0,0), (round(rows/2),round(rows/2)), rows, width) 
 
     #Creating the snake
-    snack = cube(randomSnack(rows,s), color=(0,255,0))
+    snack = cube(randomSnack(rows,s), rows, width, color=(0,255,0))
 
     #Creating the clock to add delay
     clock = pygame.time.Clock()
@@ -284,9 +311,11 @@ def main():
     flag = True
     while flag:
         #Adding some delay to the game
-        pygame.time.delay(50) 
-        #Ensures game doesn't run more than 10fps
-        clock.tick(6) 
+        pygame.time.delay(100) 
+
+        #Ensures game doesn't run more than xfps
+        #I added to this code to change the fps depending on how many rows there are
+        clock.tick(8)
 
         #Moving the snake
         s.move()
@@ -296,17 +325,24 @@ def main():
             #Adding a cube to the snack
             s.addCube()
             #Making a new snack
-            snack = cube(randomSnack(rows,s), color=(0,255,0))
+            snack = cube(randomSnack(rows,s), rows, width,color=(0,255,0))
         
         #Checking to see if the snake has killed itself
         #Looping through all of the cubes in the body
         for x in range(len(s.snakeBody)):
             #Seeing if any of the cubes have the same position
             if s.snakeBody[x].pos in list(map(lambda z:z.pos, s.snakeBody[x+1:])):
-                print("Score: ", len(s.snakeBody))
-                message_box("You Lost!","Play Again...")
-                s.reset((10,10))
+                #Collecting / Storing the High Score to the file
+                score = len(s.snakeBody)
+                highscore, record = getHighscore(str(rows), str(score))
+                if record : message_box("You Lost!", "New High Score! : " + highscore + " ,Play Again...")
+                else : message_box("You Lost!","You score : "+ str(score) + " ,High Score : " + highscore + " ,Play Again...")
+                s.reset((round(rows/2),round(rows/2)))
                 break
+
+        #Game Win Checking
+        if len(s.snakeBody) == rows*rows:
+            message_box("You Won!", "Well done, you won! Play again ? ")
 
         #Redrawing the window
         redrawWindow(win)
