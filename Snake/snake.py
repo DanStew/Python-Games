@@ -262,25 +262,35 @@ def getHighscore(rows, score):
     newHighScore = False
     rowFound = False
 
-    with open('highScore.txt') as f:
-        for line in f:
+    with open('highScore.txt', 'r') as f:
+        #Collecting all of the information from the file, so can be changed if needed
+        data = f.readlines()
+        lineCounter = -1
+        for line in data:
+            #Incrementing line counter
+            lineCounter += 1
+            #Splitting the data into individual items ([row, score])
             lineData = line.split(" ")
-            print(lineData)
             if lineData[0] == rows:
-                print("Row Found")
-                print(lineData[1])
                 rowFound = True
-                if score > lineData[1]:
+                if int(score) > int(lineData[1]):
+                    #Making the line to be stored later
+                    data[lineCounter] = rows + " " + score + "\n"
                     newHighScore = True
                 else : 
-                    highScore = lineData[1]
+                    #Returning back to the system
+                    return lineData[1], False
     
-    if rowFound == False or newHighScore == True : 
-        with open('highScore.txt', 'w') as f:
-            f.write(rows + ' ' + score)
+    #Checking to see whether that row number has been used before
+    if rowFound == False : 
+        with open('highScore.txt', 'a') as f:
+            f.write(rows + ' ' + score + "\n")
             return score, True
-    else : 
-        return highScore, False
+    #Seeing if a new highscore has been reached
+    elif newHighScore == True : 
+        with open('highScore.txt', 'w') as f:
+            f.writelines(data)
+            return score, True
     
 
 #This is the main function that everything is called from
