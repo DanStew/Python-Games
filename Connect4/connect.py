@@ -1,5 +1,13 @@
 import pygame
 import numpy as np
+import sys
+import math
+
+#Defining colours to be used
+BLUE = (0,0,255)
+BLACK = (0,0,0)
+RED = (255,0,0)
+YELLOW = (255,255,0)
 
 #Initialising board dimensions
 #These variables are global, so capitalised
@@ -63,6 +71,24 @@ def print_board(board):
      #This command flips the matrix to be printed correctly
      print(np.flip(board,0))
 
+#Functions below are to make the gui for the game
+def draw_board(board):
+    board = np.flip(board,0)
+    #Looping through every circle in the grid
+    for col in range(COLUMN_COUNT):
+        for row in range(ROW_COUNT):
+            #Making a rectangle and then drawing a circle over them for each piece
+            pygame.draw.rect(screen, BLUE, (col*SQUARESIZE,row*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE))
+
+            #Finding the correct color to draw the circle
+            if board[row][col] == 0 : color = BLACK
+            if board[row][col] == 1 : color = RED 
+            if board[row][col] == 2 : color = YELLOW
+            #Drawing the circle onto the grid
+            pygame.draw.circle(screen, color, (int(col*SQUARESIZE+SQUARESIZE/2), int(row*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)), radius)
+
+
+
 #Terminal state check
 game_over = False
 
@@ -72,30 +98,78 @@ board = create_board()
 #Defining who's turn it is
 turn = 0
 
+#Initialising pygame
+pygame.init()
+#Defining and Making the screen size
+SQUARESIZE = 100
+radius = (int(SQUARESIZE) / 2 - 5)
+width = COLUMN_COUNT*SQUARESIZE
+height = (ROW_COUNT + 1) *SQUARESIZE # +1 included to include top row to place counters
+size = (width,height)
+screen = pygame.display.set_mode(size)
+draw_board(board)
+
+#Initialising a font to be used to write
+myFont = pygame.font.SysFont("monospace", 75)
+
 #Main game function
 while not game_over:
-    #Printing the board to the screen
-    print_board(board)
 
-    #Asking for players inputs
-    if turn % 2 == 0:
-        col = int(input("Player 1, Make your Selection (0-6):"))
-        player = 1  
-    else:
-        col = int(input("Player 2, Make your Selection (0-6):"))
-        player = 2
-    
-    #Making the move the player submitted
-    if is_valid_location(board, col):
-        row = get_next_open_row(board, col)
-        drop_piece(board,row,col,player)
-    
-    #Checking to see whether the user has won
-    if winning_move(board,player):
-         print(f"Player {player} Wins!")
-         break
+    #Updating the display
+    pygame.display.update()
 
-    #Incrementing the turn variable
-    turn += 1
+    #Processing all of the events that pygame takes in
+    #This event loop is what is needed to ensure the pygame window remains open
+    for event in pygame.event.get():
+
+        #Allowing the user to exit the game
+        if event.type == pygame.QUIT:
+            sys.exit()
+
+        #Checking to see where the users mouse it
+        if event.type == pygame.MOUSEMOTION:
+            #Blacking out previous circles draw
+            pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+            #Drawing the circle onto the screen
+            if turn % 2 == 0: pygame.draw.circle(screen, RED, (event.pos[0], int(SQUARESIZE/2)), radius)
+            else : pygame.draw.circle(screen, YELLOW, (event.pos[0], int(SQUARESIZE/2)), radius)
+    
+        #Seeing if the user wants to drop a piece
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            #Asking for players inputs
+            if turn % 2 == 0:
+                #event.pos[0] returns the x position where the user has pressed
+                col = int(math.floor(event.pos[0] / SQUARESIZE))
+                player = 1  
+            else:
+                col = int(math.floor(event.pos[0] / SQUARESIZE))
+                player = 2
+    
+            #Making the move the player submitted
+            if is_valid_location(board, col):
+                row = get_next_open_row(board, col)
+                drop_piece(board,row,col,player)
+                validMove = True
+
+                #Printing the board to the screen
+                draw_board(board)
+
+                #Checking to see whether the user has won
+                if winning_move(board,player):
+                    pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+                    label = myFont.render("Player 1 wins!!", 1, RED)
+                    screen.blit(label, (20,20))
+                    pygame.time.wait(3000)
+                    game_over = True
+
+                #Incrementing the turn variable
+                turn += 1
+            #Error Handling if move is invalid
+            else : 
+                print("Invalid Move, Go again")
+                break
+            
+
+    
 
     
