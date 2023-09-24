@@ -2,7 +2,19 @@ import socket
 from _thread import *
 import sys
 
-server = ""
+"""
+Running the server and client script
+The server script must always be running
+Whenever doing this, you must first setup the server script
+You can then add as many client scripts afterwards to be able to connect to the server
+You can run multiple client scripts on the same machine, as well as also run the server
+"""
+
+
+#The ip address for this is found by going to the command prompt and typing ipconfig
+#Then, use the ipv4 address of the bottom set that comes up for the address
+server = "10.233.207.59"
+
 port = 5555 #Need to use a port that you know will be left open
 
 #Setting up the socket to be used
