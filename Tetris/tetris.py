@@ -247,7 +247,7 @@ def draw_grid(surface, grid):
               pygame.draw.line(surface, (128,128,128), (top_left_x + j*block_size,top_left_y), (top_left_x + j*block_size, top_left_y+play_height))    
                 
 #To clear the row a row has been has been completed
-def clear_rows(grid, locked):
+def clear_rows(grid, locked,win):
     #Incremental variable
     #This variable helps to understand how many rows you have to shift down
     inc = 0
@@ -283,7 +283,11 @@ def clear_rows(grid, locked):
                     newKey = (x,y+inc)
                     #Making a new key in locked with the same color value as the previous key did
                     #locked.pop returns the color of the cube
-                    locked[newKey] = locked.pop(key)   
+                    locked[newKey] = locked.pop(key) 
+
+    #Checking to see if the user got a tetris
+    if inc == 4:
+          draw_text_middle("Tetris", 60,(255,255,255),win)
     return inc         
 
 #Drawing the next shape off the screen, and showing what it is
@@ -347,7 +351,6 @@ def draw_window(surface,grid,score=0,highscore=0):
 #Code to score the highscore for the game in the system
 def update_score(nscore):
       score = max_score()
-      
       with open('score.txt', 'w') as f:
             if int(score) > nscore:
                   f.write(str(score))
@@ -462,7 +465,7 @@ def main(win):
                   next_piece = get_shape()
                   change_piece = False
                   #Clearing the rows
-                  cleared = clear_rows(grid, locked_positions)
+                  cleared = clear_rows(grid, locked_positions,win)
                   score += 10*cleared
 
             #Drawing the grid onto the surface
