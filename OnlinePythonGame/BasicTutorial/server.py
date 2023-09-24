@@ -43,6 +43,7 @@ print("Waiting for a connection, Server Started")
 #This code can continue running without needing to be completed, and the code will still continue to move on
 #Means you don't have to wait for the function to run
 def threaded_client(connection):
+    connection.send(str.encode("Connected"))
     reply = ""
     while True:
         try : 
@@ -65,7 +66,11 @@ def threaded_client(connection):
             #You have to encode the data back into bytes, which is what this does
             connection.sendall(str.encode(reply))
         except :
+            print("Error occurred when sending")
             break
+    
+    print("Lost connection")
+    connection.close()
 
 #While loop to continuously look for connections
 while True : 
